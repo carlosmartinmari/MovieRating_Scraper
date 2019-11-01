@@ -1,0 +1,12 @@
+name: QueVeoEstaNoche
+title: QueVeoEstaNoche
+username:
+account: carlosmartin
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 1387146
+bundleId: 2542049
+url: https://carlosmartin.shinyapps.io/QueVeoEstaNoche/
+when: 1572224273.90166
+asMultiple: FALSE
+asStatic: FALSE
