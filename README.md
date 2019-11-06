@@ -1,12 +1,10 @@
----
-title: "README"
-output: README.md
----
+## Imagen identificativa
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
+![Captura de la herramienta. Enlace: https://carlosmartin.shinyapps.io/QueVeoEstaNoche/ ](./report/Captura_QVEN.png)
 
+## Enlace a la plataforma
+
+https://carlosmartin.shinyapps.io/QueVeoEstaNoche/ 
 
 ## Descripción
 
@@ -27,9 +25,6 @@ Para evitar sobresaturar las webs de filmaffinity y de imdb, ya que han sido tan
 
 Mi intención con esto además era tratar de seguir con el proceso de datos de una manera dinámica.
 
-## Imagen identificativa
-
-![Captura de la herramienta. Enlace: https://carlosmartin.shinyapps.io/QueVeoEstaNoche/ ](./report/Captura_QVEN.png)
 
 ## Contexto
 
