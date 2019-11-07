@@ -129,8 +129,9 @@ getFilmAffinityMovie <- function(search_query = "aladdin"){
   
   year_movie_FA <- unlist(xpathApply(content_html, "//div[contains(@class,'mc-title')]", xmlValue))
   #extraemos de ahí el año y quitamos paréntesis
-  year_movie_FA <-  str_extract(year_movie_FA,"(\\([0-9]{4}\\))")
-  year_movie_FA <- str_extract("blade runner 2010 (2015)","([0-9]{4})+")
+  year_movie_FA <-  str_extract(year_movie_FA,"(\\([0-9]{4}\\))+")
+  year_movie_FA <- gsub("\\(","",year_movie_FA)
+  year_movie_FA <- gsub("\\)","",year_movie_FA)
   
   rating_movie_FA <- unlist(xpathApply(content_html, "//div[contains(@class,'avgrat-box')]", xmlValue))
   rating_movie_FA[rating_movie_FA == "--"] <- NA

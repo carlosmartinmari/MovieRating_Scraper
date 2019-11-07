@@ -243,9 +243,9 @@ server <- function(input, output) {
          # histo_pelis <- as.data.table(histo_pelis)
          # setkey(histo_pelis,"Title")
          
-         df_peli <- subset(histo_pelis, histo_pelis[["Title"]] == search_query[1])# histo_pelis[search_query,][1,]
+         df_peli <- subset(histo_pelis, histo_pelis[["Title"]] == search_query[1])[1,]# histo_pelis[search_query,][1,]
          
-         cat(paste0("Leyendo reviews de: ", search_query," en ", df_peli[["Url"]]))
+          cat(paste0("Leyendo reviews de: ", search_query," en ", df_peli[["Url"]]))
          
          reviews <- subset(histo_reviews, histo_reviews[["Title"]] == search_query)
         
