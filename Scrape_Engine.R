@@ -236,15 +236,15 @@ getWordcloud <- function(vectorofwords){
                     "tambien","solo")
   
   mycorpus<-tm_map(mycorpus,removeWords, c(stopwords("spanish"),ownstopwords))
-  
-  # tdm_wc<-TermDocumentMatrix (mycorpus) #Creates a TDM
-  # 
-  # tdm_wc_matrix <-as.matrix(tdm_wc) #Convert this into a matrix format
-  # 
-  # v <- sort(rowSums(tdm_wc_matrix), decreasing = TRUE) #Gives you the frequencies for every word
-  # 
-  # df_freqs <- data.frame("word" = names(v), "freq" = v)
-  # 
+
+  tdm_wc<-TermDocumentMatrix (mycorpus) #Creates a TDM
+
+  tdm_wc_matrix <-as.matrix(tdm_wc) #Convert this into a matrix format
+
+  v <- sort(rowSums(tdm_wc_matrix), decreasing = TRUE) #Gives you the frequencies for every word
+
+  df_freqs <- data.frame("word" = names(v), "freq" = v)
+
   return(mycorpus)
   # wordcloud2(df_freqs, size=1.6,backgroundColor="#f5f5f5")
   # Summary(v)

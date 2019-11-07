@@ -10,21 +10,22 @@
 library(shiny)
 library(shinyWidgets)
 source("./Scrape_Engine.R")
-library(data.table)
+# library(data.table)
 
 histo_pelis <- read.csv("./data/datos_peli.csv", stringsAsFactors = F)
 histo_pelis$X <- NULL
-histo_pelis <- as.data.table(histo_pelis)
+# histo_pelis <- as.data.table(histo_pelis)
 histo_pelis$Acty_Date <- as.Date(histo_pelis$Acty_Date)
-setkey(histo_pelis,"Title")
+# setkey(histo_pelis,"Title")
 
 histo_busquedas <- read.csv("./data/histo_busquedas.csv", stringsAsFactors = F)
 histo_busquedas$X <- NULL
-histo_busquedas <- as.data.table(histo_busquedas)
+# histo_busquedas <- as.data.table(histo_busquedas)
 histo_busquedas$Acty_Date <- as.Date(histo_busquedas$Acty_Date)
-setkey(histo_busquedas,"Search")
+# setkey(histo_busquedas,"Search")
 
-histo_reviews <- read.csv("./data/comentarios_peli.csv", stringsAsFactors = F)
+histo_reviews <- read.csv("./data/comentarios_peli.csv", stringsAsFactors = F, encoding = "UTF-8")
+histo_reviews$Detalle <- iconv(histo_reviews$Detalle, to = "ASCII//TRANSLIT")
 histo_reviews$X <- NULL
 
 # Define UI for application that draws a histogram
@@ -117,31 +118,50 @@ server <- function(input, output) {
   #   })
      output$Poster <- renderUI({
        search_query <- {input$search}
+       
        if(nchar(search_query) > 1 ){ 
-         search_query <- histo_busquedas[search_query,][["Result"]]
-         if(is.na(search_query)) search_query <- {input$search}
+         search_query <- subset(histo_busquedas, histo_busquedas[["Search"]] == search_query[1])
          
-         df_peli <- histo_pelis[search_query,][1,]
+         doScraping <- F
+         
+         #histo_busquedas[search_query,][["Result"]][1]
+         if(nrow(search_query) < 1) {
+           search_query <- {input$search}
+           doScraping <- T
+         }
+         else{
+           search_query <- search_query[["Result"]][1]
+           df_peli <- subset(histo_pelis, histo_pelis[["Title"]] == search_query[1])
+           
+           if(((df_peli$Acty_Date) - Sys.Date() )> 180 ) doScraping <- T
+         }
+           
+         
+         # df_peli <- subset(histo_pelis, histo_pelis[["Title"]] == search_query[1])#histo_pelis[search_query,][1,]
          
          cat(paste0("Buscando: ", search_query, "\n"))
 
-         if( is.na(df_peli$Rating_FA) | (as.Date(df_peli$Acty_Date) - Sys.Date() )> 180 ){
+         if(doScraping){#nrow(df_peli) == 0 | ((df_peli$Acty_Date) - Sys.Date() )> 180 ){
            cat("\nEmpezando proceso de scraping")
            df_peli <- main_scraper(search_query)
            src <- df_peli[["Poster"]][1]
-           df_peli <- as.data.table(df_peli)
+           # df_peli <- as.data.table(df_peli)
            if(!is.na(df_peli$Rating_FA)){ 
              cat(paste0("\nSaving historic file \n"))
              df_peli$Acty_Date <- Sys.Date()
              histo_pelis <<- rbind(histo_pelis, df_peli)
+             # setkey(histo_pelis,"Title")
              write.csv(histo_pelis,"./data/datos_peli.csv")
            }
          }
 
-       
-         histo_busquedas <<- rbind(histo_busquedas,
-                                   data.table("Search" = search_query, "Result"=df_peli$Title[1],
-                                              "Acty_Date" = Sys.Date()) )  
+         actividad <- data.frame("Search" = {input$search}, "Result"=df_peli$Title[1],
+                                 "Acty_Date" = Sys.Date())
+         # actividad <- as.data.table(actividad)
+         
+         histo_busquedas <<- rbind(histo_busquedas,actividad)  
+         # setkey(histo_busquedas,"Search")
+          
          cat(paste0("\nSaving activity file \n"))
          write.csv(histo_busquedas,"./data/histo_busquedas.csv")
          
@@ -209,33 +229,41 @@ server <- function(input, output) {
        if(nchar(search_query) > 1){
          cat("Haciendo wordcloud\n")
          
-         histo_busquedas <- as.data.table(histo_busquedas)
-         setkey(histo_busquedas,"Search")  
+         # histo_busquedas <- as.data.table(histo_busquedas)
+         search_query <- subset(histo_busquedas, histo_busquedas[["Search"]] == search_query[1])
+         #histo_busquedas[search_query,][["Result"]][1]
+         if(nrow(search_query) == 0) 
+           search_query <- {input$search}
+         else
+           search_query <- search_query[["Result"]][1]
          
-         search_query <- histo_busquedas[search_query,][["Result"]][1]
+         cat("\nWC de peli")
+         cat(search_query)
+         cat("\n")
+         # histo_pelis <- as.data.table(histo_pelis)
+         # setkey(histo_pelis,"Title")
          
-         if(is.na(search_query)) return() #search_query <- {input$search}
-         
-         histo_pelis <- as.data.table(histo_pelis)
-         setkey(histo_pelis,"Title")
-         
-         df_peli <- histo_pelis[search_query,][1,]
+         df_peli <- subset(histo_pelis, histo_pelis[["Title"]] == search_query[1])# histo_pelis[search_query,][1,]
          
          cat(paste0("Leyendo reviews de: ", search_query," en ", df_peli[["Url"]]))
          
-         reviews <- getPeopleReviews_FA(df_peli[["Url"]])
+         reviews <- subset(histo_reviews, histo_reviews[["Title"]] == search_query)
+        
+         if(nrow(reviews) == 0){
+           reviews <- getPeopleReviews_FA(df_peli[["Url"]])
+           
+           reviews$inclusionDate <- Sys.Date()
+           reviews$Title <-  df_peli[["Title"]]
+           reviews$Url <- df_peli[["Url"]]
+           histo_reviews <<- rbind(reviews,histo_reviews)
+           write.csv(reviews, "./data/comentarios_peli.csv")
+         }
          
-         reviews$inclusionDate <- Sys.Date()
-         reviews$Title <-  df_peli[["Title"]]
-         reviews$Url <- df_peli[["Url"]]
-         
-         histo_reviews <- rbind(reviews,histo_reviews)
-         write.csv(reviews, "./data/comentarios_peli.csv")
-         
+
          cat("\nHaciendo la nube de palabras")
          # wordcloud2(getWordcloud(reviews$Detalle)[1:20,], size=0.5,backgroundColor="#f5f5f5")
          # 
-         wordcloud (getWordcloud(reviews$Detalle), scale=c(6,0.2), max.words=30, 
+         wordcloud (getWordcloud(reviews$Detalle), scale=c(4,0.2), max.words=30, 
                     random.order=FALSE, rot.per=0.35, use.r.layout=FALSE, colors=brewer.pal(8, "Dark2"))
        }
 
