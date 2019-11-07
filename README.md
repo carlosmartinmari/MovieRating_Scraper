@@ -23,7 +23,7 @@ Para evitar sobresaturar las webs de filmaffinity y de imdb, ya que han sido tan
 3. Si la cadena de búsqueda ya hubiese aparecido con anterioridad, y la información la consideramos suficientemente reciente (menos de 6 meses naturales), mostramos la información que tenemos almacenada. Si no, se inicia efectivamente el proceso de scraping.
 4. Por supuesto, detecto algunas posibles mejoras que hacer, tanto en la plataforma como en el motor. Podríamos extraer más información, y se podrían implementar mejoras en el diseño.
 
-Mi intención con esto además era tratar de seguir con el proceso de datos de una manera dinámica.
+Mi intención con esto además era tratar de seguir con el proceso de datos de una manera dinámica. Además de esta manera, es más difícil que las webs fuentes nos identifiquen como bots porque tendremos, precisamente, un comportamiento humano y será con el comportamiento humano que se irá rellenando la base de datos de películas.
 
 
 ## Contexto
@@ -52,7 +52,7 @@ De los comentarios:
 * **Detalle**: Contenido de la reseña en FilmAffinity
 * **inclusionDate**:  Fecha de actualización de la película.
 * **Title**: Título de la película
-* **URL**: URL con el poster de la película
+* **URL**: URL de la película
 
 
 ## Agradecimientos
